@@ -39,7 +39,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     //options.SignIn.RequireConfirmedEmail = true;
 }).AddEntityFrameworkStores<ApplicationContext>().AddDefaultTokenProviders();
 
-//builder.Services.AddLocalization(options => { options.ResourcesPath = "Resources"; });
+builder.Services.AddLocalization(options => { options.ResourcesPath = "Resources"; });
 builder.Services.AddCors();
 builder.Services.ConfigureApplicationCookie(options =>
 {

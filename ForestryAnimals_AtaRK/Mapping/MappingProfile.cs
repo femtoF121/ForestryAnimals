@@ -19,6 +19,7 @@ namespace ForestryAnimals_AtaRK.Mapping
             CreateMap<AddPersonnelRequest, Personnel>();
 
             CreateMap<AddForestryRequest, Forestry>();
+            CreateMap<EditForestryRequest, Forestry>();
 
             CreateMap<AddAnimalRequest, Animal>();
             CreateMap<EditAnimalRequest, Animal>();
