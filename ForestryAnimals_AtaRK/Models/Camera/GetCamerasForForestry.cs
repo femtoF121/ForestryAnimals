@@ -2,9 +2,8 @@
 
 namespace ForestryAnimals_AtaRK.Models.Camera
 {
-    public class AddCameraRequest
+    public class GetCamerasForForestry
     {
         [Required] public int ForestryId { get; set; }
-        [Required] public int SerialNumber { get; set; }
     }
 }

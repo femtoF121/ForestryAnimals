@@ -4,6 +4,7 @@ using ForestryAnimals_AtaRK.Models.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Data;
 
 namespace ForestryAnimals_AtaRK.Controllers
@@ -15,17 +16,20 @@ namespace ForestryAnimals_AtaRK.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly ApplicationContext _context;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer<SharedResource> _localizer;
         public AccountController(UserManager<User> userManager,
                                  SignInManager<User> signInManager,
                                  ApplicationContext context,
                                  IMapper mapper,
                                  RoleManager<IdentityRole> roleManager,
-                                 IConfiguration configuration)
+                                 IConfiguration configuration,
+                                 IStringLocalizer<SharedResource> localizer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
             _mapper = mapper;
+            _localizer = localizer;
             _ = RoleInitializer.RoleInit(userManager, roleManager, configuration);
         }
 
@@ -53,13 +57,13 @@ namespace ForestryAnimals_AtaRK.Controllers
                     }
                     return BadRequest(result.Errors);
                 }
-                return BadRequest("Passwords are not the same");
+                return BadRequest(_localizer["Passwords are not the same"].Value);
             }
             catch (MimeKit.ParseException)
             {
                 var user = _mapper.Map<Owner>(request);
                 await _userManager.DeleteAsync(user);
-                return BadRequest(new[] { "Invalid email" });
+                return BadRequest(new[] { _localizer["Invalid email"].Value });
             }
             //catch
             //{
@@ -75,7 +79,7 @@ namespace ForestryAnimals_AtaRK.Controllers
         public async Task<IActionResult> LogInAsync([FromForm] LoginRequest request)
         {
             var result = await _signInManager.PasswordSignInAsync(request.UserName, request.Password, isPersistent: true, lockoutOnFailure: false);
-            return result.Succeeded ? Ok() : BadRequest("Invalid login and/or password");
+            return result.Succeeded ? Ok() : BadRequest(_localizer["Invalid login and/or password"].Value);
         }
 
         [HttpGet]
@@ -96,7 +100,7 @@ namespace ForestryAnimals_AtaRK.Controllers
         {
             User user = await _userManager.GetUserAsync(User);
             if (user != null) return Ok(user);
-            return Unauthorized(new[] { "Firstly you have to log in" });
+            return Unauthorized(new[] { _localizer["Firstly you have to log in"].Value });
         }
 
         [Authorize]
@@ -107,7 +111,7 @@ namespace ForestryAnimals_AtaRK.Controllers
         {
             User user = await _userManager.GetUserAsync(User);
             if (user != null) return Ok(await _userManager.GetRolesAsync(user));
-            return Unauthorized(new[] { "Firstly you have to log in" });
+            return Unauthorized(new[] { _localizer["Firstly you have to log in"].Value });
         }
 
         [Authorize(Roles = "owner")]
@@ -119,7 +123,7 @@ namespace ForestryAnimals_AtaRK.Controllers
         {
             User user = await _userManager.GetUserAsync(User);
             if (user is null)
-                return Unauthorized(new[] { "Firstly you have to log in" });
+                return Unauthorized(_localizer["Firstly you have to log in"].Value);
             var result = await _userManager.DeleteAsync(user);
             return result.Succeeded ? await LogOutAsync() : BadRequest(result.Errors.Select(e => e.Description));
         }
